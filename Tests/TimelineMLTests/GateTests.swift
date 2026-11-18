@@ -31,7 +31,8 @@ final class FaultMatrixTests: XCTestCase {
         for fault in Fault.allCases {
             let saved = Fault.active
             Fault.active = [fault]
-            defer { Fault.active = saved }
+            Gates.resetCaches()
+            defer { Fault.active = saved; Gates.resetCaches() }
             let failed = Set(Gates.run().filter { $0.status == .fail && $0.name != "perf.budgets" }.map { $0.name })
             XCTAssertEqual(failed, Gates.expectedFailures[fault], "\(fault)")
         }

@@ -228,6 +228,10 @@ public enum Gates {
 
     public static var names: [String] { all.map { $0.name } }
 
+    /// Golden speech and transcripts are cached per run; a fault that changes how they are made
+    /// (e.g. synthRateAssumed48k) needs them rebuilt.
+    public static func resetCaches() { spokenCache = nil; transcriptCache = nil }
+
     public static func run(_ names: [String] = []) -> [GateResult] {
         all.filter { names.isEmpty || names.contains($0.name) }.map { g in
             if g.needsSpeech && !SpeechEngine.authorized {
