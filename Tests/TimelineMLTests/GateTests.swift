@@ -19,6 +19,7 @@ final class GateTests: XCTestCase {
     func test_timecode_rates() throws { try gate("timecode.rates") }
     func test_speech_sample_rate() throws { try gate("speech.sample-rate") }
     func test_transcript_timeline_mapping() throws { try gate("transcript.timeline-mapping") }
+    func test_transcript_segments() throws { try gate("transcript.segments") }
     func test_transcript_accuracy() throws { try gate("transcript.accuracy") }
     func test_transcript_search() throws { try gate("transcript.search") }
     func test_transcript_on_device() throws { try gate("transcript.on-device") }

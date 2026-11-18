@@ -181,6 +181,14 @@ public enum Gates {
             if !index.search("story", in: edit).isEmpty { problems.append("found a word from a line not in the edit") }
             return r("transcript.timeline-mapping", problems.isEmpty, problems.isEmpty ? "hits land in timeline time; cut lines are not found" : problems.joined(separator: "; "))
         },
+        Gate(name: "transcript.segments", needsSpeech: false) {
+            // Recorded from a real on-device run: one segment held three words.
+            let words = splitSegment("village forgot that", time: 13.05, duration: 0.99)
+            let idx = TranscriptIndex(words + [Word(text: "night", time: 14.04, duration: 0.45)])
+            let v = idx.search("village"), n = idx.search("that night")
+            let ok = v == [13.05] && n.count == 1 && n[0] > 13.05 && n[0] < 14.04
+            return r("transcript.segments", ok, ok ? "a 3-word segment is searchable word by word" : "village \(v), that night \(n)")
+        },
         Gate(name: "transcript.accuracy", needsSpeech: true) {
             let t = try transcript()
             let hyp = t.words.map { $0.text }.joined(separator: " ")
@@ -241,5 +249,6 @@ public enum Gates {
         .dropFrameIgnored: ["timecode.rates"],
         .transcriptSourceTimeOnTimeline: ["transcript.timeline-mapping"],
         .synthRateAssumed48k: ["speech.sample-rate"],
+        .segmentsAssumedOneWord: ["transcript.segments"],
     ]
 }

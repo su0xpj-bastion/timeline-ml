@@ -16,6 +16,7 @@ that move a cut by a frame or land a search hit in the wrong place.
 | `timecode.rates` | reference timecodes at 23.976, 25, 30, 29.97 DF, 59.94 DF |
 | `speech.sample-rate` | 22.05 kHz synthesized speech keeps its length at 48 kHz |
 | `transcript.timeline-mapping` | search in an edited timeline returns timeline time; words from cut lines are not found |
+| `transcript.segments` | a recognizer segment holding several words is searchable word by word |
 | `transcript.accuracy` | on-device recognition: word error rate ≤ 10% |
 | `transcript.search` | ≥ 90% of queries land inside the line they were spoken in |
 | `transcript.on-device` | recognition runs with `requiresOnDeviceRecognition` (footage never leaves the device) |
@@ -49,6 +50,7 @@ Accelerate/vDSP:
 | dropFrameIgnored (29.97 counted as 30 non-drop) | timecode.rates |
 | transcriptSourceTimeOnTimeline (search hits in clip time on an edited timeline) | transcript.timeline-mapping |
 | synthRateAssumed48k (22.05 kHz speech used as 48 kHz) | speech.sample-rate |
+| segmentsAssumedOneWord (one recognizer segment = one word) | transcript.segments |
 
 ## Measured locally
 
@@ -64,17 +66,25 @@ Findings while calibrating:
 - The flux detector puts beats a constant 4 ms early, because windows are timed by their centre. That offset is measured on the golden set and corrected.
 - At 120 BPM and 25 fps, every other beat falls exactly between two frames. "On the beat" therefore means the nearest frame, ±½ frame.
 - The system voice renders at 22.05 kHz. Treating it as 48 kHz would shrink every line to 46% of its length.
+- **On-device recognition** (all 14 gates, with permission): word error rate 7.3%, at 0.06× real time, on-device only.
+  - **Multi-word segment.** It returned "village forgot that" as one segment. Search that assumed one word per segment could find neither "village" nor "that night" (9/12 hits). Splitting segments by length raised that to 11/12. The old assumption is pinned as a fault.
+  - **Homophone.** "sail" is heard as "sale" every time. This is a real recognition miss on a homophone, and the gate reports it rather than hiding it.
+  - **"two".** "Chapter two" comes back as "Chapter 2".
 
 ## Speech permission: why three gates skip on CI
 
 On-device recognition needs the user's permission. A headless CI runner cannot grant it, so the
-three `transcript.*` recognition gates report **SKIP** there, never PASS. They run anywhere the
-permission has been given once:
+three recognition gates report **SKIP** there, never PASS. They run wherever permission has been given:
 
 ```bash
-scripts/build-local.sh && .build/local/tml authorize   # shows the system dialog once
-.build/local/tml                                       # all 13 gates
+scripts/build-local.sh
+scripts/tml-app.sh authorize     # system dialog
+scripts/tml-app.sh run           # all 14 gates
 ```
+
+Two macOS details:
+- **Run it as an app.** A bare command-line tool inherits its launcher's privacy identity (Terminal, an IDE, an agent host). If that app has no `NSSpeechRecognitionUsageDescription`, TCC kills the process (SIGABRT, namespace TCC), which is what happened first here. `tml-app.sh` wraps `tml` in a signed `TimelineML.app` so the request is its own.
+- **Permission does not survive a rebuild.** An ad-hoc signature changes with every build, and TCC ties the grant to it, so each rebuild asks again. A stable signing identity (Apple Development) avoids this on a Jenkins agent.
 
 The search and timeline logic is still gated on CI (`transcript.timeline-mapping`), using the
 golden transcript.

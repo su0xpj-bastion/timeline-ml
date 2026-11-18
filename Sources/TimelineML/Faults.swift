@@ -9,6 +9,7 @@ public enum Fault: String, CaseIterable {
     case dropFrameIgnored             // 29.97 timecode counted as 30 non-drop
     case transcriptSourceTimeOnTimeline // search hits reported in source-clip time on an edited timeline
     case synthRateAssumed48k          // 22.05 kHz synthesized speech treated as 48 kHz (no resample)
+    case segmentsAssumedOneWord       // a recognizer segment can hold several words ("village forgot that")
 
     public static var active: Set<Fault> = {
         Set((ProcessInfo.processInfo.environment["TML_FAULTS"] ?? "").split(separator: ",").compactMap { Fault(rawValue: String($0)) })

@@ -5,7 +5,7 @@ import TimelineML
 /// tml list | expected
 /// tml authorize                  ask for on-device speech recognition permission (system dialog)
 let args = Array(CommandLine.arguments.dropFirst())
-let verbs = ["run", "list", "expected", "authorize"]
+let verbs = ["run", "list", "expected", "authorize", "transcript"]
 let cmd = args.first.flatMap { verbs.contains($0) ? $0 : nil } ?? "run"
 let names = args.filter { !$0.hasPrefix("--") && !verbs.contains($0) }
 
@@ -15,6 +15,14 @@ case "list":
 case "expected":
     let m = Dictionary(uniqueKeysWithValues: Gates.expectedFailures.map { ($0.key.rawValue, $0.value.sorted()) })
     print(String(data: try! JSONSerialization.data(withJSONObject: m, options: [.prettyPrinted, .sortedKeys]), encoding: .utf8)!)
+case "transcript":
+    // Words the recognizer heard, with times, against each golden line's span.
+    let sp = Golden.speech()
+    for (i, s) in sp.spans.enumerated() { print(String(format: "line %d  %6.2f-%6.2f  %@", i, s.start, s.end, s.text)) }
+    do {
+        let run = try SpeechEngine.transcribe(sp.clip)
+        for w in run.words { print(String(format: "  %6.2f +%.2f  %@", w.time, w.duration, w.text)) }
+    } catch { print("error: \(error)") }
 case "authorize":
     let s = SpeechEngine.requestAuthorization()
     print("speech recognition authorization: \(["notDetermined", "denied", "restricted", "authorized"][s.rawValue])")

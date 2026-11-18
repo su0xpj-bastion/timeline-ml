@@ -46,7 +46,7 @@ public enum SpeechEngine {
         let t0 = Date()
         let task = rec.recognitionTask(with: req) { result, err in
             if let r = result, r.isFinal {
-                words = r.bestTranscription.segments.map { Word(text: $0.substring, time: $0.timestamp, duration: $0.duration) }
+                words = r.bestTranscription.segments.flatMap { seg in splitSegment(seg.substring, time: seg.timestamp, duration: seg.duration) }
                 done = true
             }
             if let e = err { error = e; done = true }
@@ -56,6 +56,20 @@ public enum SpeechEngine {
         task.cancel()
         if let e = error, words.isEmpty { throw TranscriptError.failed("\(e)") }
         return Run(words: words, onDevice: req.requiresOnDeviceRecognition && rec.supportsOnDeviceRecognition, seconds: Date().timeIntervalSince(t0))
+    }
+}
+
+/// A recognizer segment is not always one word: on-device recognition returned "village forgot
+/// that" as a single segment. Split it, sharing the segment's time across words by length.
+public func splitSegment(_ text: String, time: Double, duration: Double) -> [Word] {
+    let parts = text.split(separator: " ").map(String.init)
+    guard parts.count > 1, !Fault.on(.segmentsAssumedOneWord) else { return [Word(text: text, time: time, duration: duration)] }
+    let total = Double(parts.reduce(0) { $0 + $1.count })
+    var t = time
+    return parts.map { p in
+        let d = duration * Double(p.count) / total
+        defer { t += d }
+        return Word(text: p, time: t, duration: d)
     }
 }
 
