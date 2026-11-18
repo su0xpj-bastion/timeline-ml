@@ -1,0 +1,15 @@
+name: ci
+on: [push, pull_request, workflow_dispatch]
+concurrency: { group: "${{ github.workflow }}-${{ github.ref }}", cancel-in-progress: true }
+jobs:
+  gates:
+    name: Gates (XCTest + fault matrix)
+    runs-on: macos-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - run: sw_vers && swift --version
+      - run: scripts/ci/gates.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: reports, path: build/reports }
