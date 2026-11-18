@@ -7,6 +7,7 @@ public struct Word: Codable, Equatable {
     /// Seconds in the *source clip*.
     public let time: Double
     public let duration: Double
+    public init(text: String, time: Double, duration: Double) { self.text = text; self.time = time; self.duration = duration }
 }
 
 public enum TranscriptError: Error { case notAuthorized, unavailable, failed(String) }
