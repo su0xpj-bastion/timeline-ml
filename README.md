@@ -5,34 +5,33 @@
 
 ## In plain English
 
-**What it is.** Tests for two editing helpers that tie video to sound.
+Tests for two editing helpers that tie video to sound.
 - **Beat detection:** cuts snap to the music.
 - **Transcript search:** type a word, jump to where it was said.
 
 Both are graded against drum tracks and spoken lines where every beat and every word's timing
 is known in advance.
 
-**Why it matters.** If every cut lands one frame early, a music video just feels wrong, and
+If every cut lands one frame early, a music video just feels wrong, and
 nobody can say why. If search lands on the wrong line, editors stop trusting it. Both problems
 are easy to measure and easy to miss.
 
-**What I built.**
 - A beat finder in Swift on Apple's Accelerate library. There is no public Apple API for this. It is accurate to about a thousandth of a second, including tempo changes, AAC files and different sample rates.
 - Snap-to-beat and broadcast timecode at 23.976, 25 and 29.97 drop-frame.
 - Transcript search on Apple's Speech framework, running on the device only (audio never uploaded), including search inside an edited timeline.
 - 14 gates and 8 planted bugs, each proven caught.
 
-**What it found.**
+Along the way, the tests turned up:
 - A loud kick drum fooled the beat finder into half tempo (fixed).
 - The recognizer sometimes returns three words as one piece, which broke search (fixed, and pinned as a test).
 - "sail" is always heard as "sale" (reported, not hidden).
 - On macOS, a command-line tool can't ask for speech permission on its own, so it runs as a tiny signed app.
 
-**Status note.** Speech recognition needs permission from the person at the Mac. CI runners
+Speech recognition needs permission from the person at the Mac. CI runners
 can't grant it, so those 3 gates show **skip** there, never pass. With permission, all 14 pass,
 with a word error rate of 7.3%.
 
-**For a tech lead.** Swift, Accelerate/vDSP, AVFoundation, Speech, AVSpeechSynthesizer,
+Swift, Accelerate/vDSP, AVFoundation, Speech, AVSpeechSynthesizer,
 XCTest, Python, GitHub Actions and Jenkins.
 
 ---
@@ -145,7 +144,7 @@ swift test -c release -Xswiftc -enable-testing  # XCTest (needs Xcode)
 <!-- set:begin -->
 ---
 
-**Part of a set.** Six small projects, one idea: test media apps with data that carries its own answer, and prove every test catches the bug it was written for.
+Six small projects, one idea: test media apps with data that carries its own answer, and prove every test catches the bug it was written for.
 
 - [frame-exact](https://github.com/su0xpj-bastion/frame-exact): timecode and edit maths, to the frame
 - [barcode-frames](https://github.com/su0xpj-bastion/barcode-frames): real video edits checked frame by frame
