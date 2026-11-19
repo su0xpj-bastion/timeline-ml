@@ -138,16 +138,3 @@ swift test -c release -Xswiftc -enable-testing  # XCTest (needs Xcode)
 
 - **Synthetic audio.** The grooves have exact beats by construction. Real music, with rubato, no drums, or beats on syncopations, needs a licensed annotated set run through the same gates.
 - **Synthetic speech.** One synthesized voice, clean, in English. Accents, noise, music beds and overlapping speakers are not covered.
-
-<!-- set:begin -->
----
-
-Six small projects, one idea: test media apps with data that carries its own answer, and prove every test catches the bug it was written for.
-
-- [frame-exact](https://github.com/su0xpj-bastion/frame-exact): timecode and edit maths, to the frame
-- [barcode-frames](https://github.com/su0xpj-bastion/barcode-frames): real video edits checked frame by frame
-- [proof-sheet](https://github.com/su0xpj-bastion/proof-sheet): a photo/video app with all 45 workflows tested
-- [enact-probe](https://github.com/su0xpj-bastion/enact-probe): live AI video, measured the way the viewer feels it
-- [vision-gate](https://github.com/su0xpj-bastion/vision-gate): report cards for on-device AI photo features
-- **[timeline-ml](https://github.com/su0xpj-bastion/timeline-ml)**: beat detection and transcript search
-<!-- set:end -->
