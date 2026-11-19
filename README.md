@@ -32,6 +32,8 @@ with a word error rate of 7.3%.
 Swift, Accelerate/vDSP, AVFoundation, Speech, AVSpeechSynthesizer,
 XCTest, Python, GitHub Actions and Jenkins.
 
+[Test plan](TEST_PLAN.md) · [Bugs found](BUGS.md) · [Test strategy](https://github.com/su0xpj-bastion/proof-sheet/blob/main/docs/TEST_STRATEGY.md)
+
 ---
 
 ## Technical detail
