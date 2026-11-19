@@ -3,8 +3,6 @@
 <!-- plain-english:begin -->
 [![ci](https://github.com/su0xpj-bastion/timeline-ml/actions/workflows/ci.yml/badge.svg)](https://github.com/su0xpj-bastion/timeline-ml/actions/workflows/ci.yml)
 
-## In plain English
-
 Tests for two editing helpers that tie video to sound.
 - **Beat detection:** cuts snap to the music.
 - **Transcript search:** type a word, jump to where it was said.
